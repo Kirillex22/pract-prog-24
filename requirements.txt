@@ -1,0 +1,10 @@
+notebook
+scikit-learn
+pandas
+matplotlib
+seaborn
+tensorflow
+catboost
+xgboost
+lightgbm
+spacy
