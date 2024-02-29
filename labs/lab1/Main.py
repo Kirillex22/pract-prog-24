@@ -53,13 +53,44 @@ def model_change_manager():
             
 def predict_manager():
     target = st.text_input("Введите метку целевого признака")
-    if target != "":
+    predict_manager_chbox = st.checkbox('Обучить модель и получить метрики качества')
+    if (target != "" and predict_manager_chbox):
         X_train, X_test, y_train, y_test = dp.get_splitted(target)
         mm.fit(X_train, y_train)
         result, report = mm.predict(X_test, y_test)
-        for i in report.keys():
-            st.write(f'{i} : {report[i]}')
+        st.json(report)
         st.write(result)
+
+def endcode_categorial_features():
+    categorial_encoder_chbox = st.checkbox('Есть ли в датасете предикторы, содержащие нечисловые категориальные значения?')
+    st.write(data[:5])
+    if (categorial_encoder_chbox):   
+        fts_to_prepare = st.multiselect(
+            'Выбор предикторов c кат. значениями', dv.features,
+            max_selections=len(dv.features)
+        )
+        sub_chbox1 = st.checkbox('Закодировать признаки')
+        if (len(fts_to_prepare) != 0 and sub_chbox1):
+            dp.encode_categorial(fts_to_prepare)
+
+def clear_anomaly():
+    sub_chbox2 = st.checkbox('Есть ли в датасете выбросы? Взгляните на диаграммы и внесите в список, если таковые имеются')
+    displacement_chbox = st.checkbox('Показать диаграммы')
+
+    if (displacement_chbox):
+        dv.show_displacement()
+                
+    if (sub_chbox2):
+        fts_to_fix = st.multiselect(
+            'Выбор предикторов с выбросами', dv.features,
+            max_selections=len(dv.features)
+        )
+        sub_chbox3 = st.checkbox('Удалить выбросы')
+        if (len(fts_to_fix) != 0 and sub_chbox3):
+            dp.remove_anomaly(fts_to_fix)
+
+def clear_trash():
+    dp.remove_trash()
 
 def preparing_manager():
     types = ["Да (указание целевого признака и получение результата)", "Нет (переход к обработке)"]   
@@ -70,33 +101,15 @@ def preparing_manager():
             predict_manager()
 
         elif current_type == types[1]:
-            dp.remove_trash()
-
-            st.markdown("Есть ли в датасете предикторы, содержащие нечисловые категориальные значения?")
-            st.write(data[:5])
-            fts_to_prepare = st.multiselect(
-                'Выбор предикторов c кат. значениями', dv.features,
-                 max_selections=len(dv.features)
-            )
-
-            if len(fts_to_prepare) != 0:
-                dp.encode_categorial(fts_to_prepare)
-
-                st.markdown("Рассмотрите распределение предикторов и выберите те, что могут содержать выбросы")
-                dv.show_displacement()
-                fts_to_fix = st.multiselect(
-                    'Выбор предикторов с выбросами', dv.features,
-                    max_selections=len(dv.features)
-                )
-
-                if len(fts_to_prepare) != 0:
-                    dp.remove_anomaly(fts_to_fix)
-                    predict_manager()
+            clear_trash()
+            endcode_categorial_features()
+            clear_anomaly()
+            sub_chbox4 = st.checkbox('Перейти к указанию целевого признака и получению результатов')  
+            if (sub_chbox4):
+                predict_manager()
 
 st.title("Предварительная обработка данных и получение предикта")
-
 data = data_loader()
-
 main_chbox = st.checkbox('Перейти к моделям')
 if(main_chbox):
     model_change_manager()
