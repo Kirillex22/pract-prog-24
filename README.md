@@ -1,0 +1,1 @@
+- lab1: https://pract-prog-24-lab1.streamlit.app/
