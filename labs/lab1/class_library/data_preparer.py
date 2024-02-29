@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.compose import ColumnTransformer
@@ -21,6 +22,9 @@ class DataPreparer:
     def remove_trash(self):
         self.data.dropna(inplace = True)
         self.data.drop_duplicates(inplace = True)
+
+    def remove_predictors(self, names_of_predictors):
+        self.data.drop(names_of_predictors, axis = 1, inplace = True)
 
     def encode_categorial(self, names_of_predictors):
         ct = ColumnTransformer(transformers=[
@@ -51,6 +55,8 @@ class DataPreparer:
     def standartisate(self, X):
         return self.st_sc.fit_transform(X)
 
+    def show_data(self):
+        st.write(self.data.head(5))
 
 
 

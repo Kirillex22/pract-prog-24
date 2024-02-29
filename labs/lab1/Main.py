@@ -28,16 +28,17 @@ dv = DataVisualisator()
 dp = DataPreparer()
 
 def data_loader():
+    seps = [',', ';']
     data = st.file_uploader("Загрузите датасет в формате *.csv", type="csv")
-    if data is not None:
-        data = pd.read_csv(data, sep = ';')
+    sep = st.selectbox("Укажите разделитель, который используется в датасете", seps, index=None)
+    if ((data is not None) and (sep is not None)):
+        data = pd.read_csv(data, sep = sep)
         dp.load_data(data)
         dv.load_data(data)
-        return data
 
 def model_change_manager():
     st.markdown("Ваш датасет:")
-    st.write(data[:5])
+    dp.show_data()
          
     types = ["Классификация *(обучение на модели Perceptron)", "Регрессия *(обучение на модели SGDRegressor)"]   
     current_type = st.selectbox("Выберите задачу ML", types, index=None)
@@ -61,32 +62,46 @@ def predict_manager():
         st.json(report)
         st.write(result)
 
+def delete_features():
+    delete_feature_chbox = st.checkbox('Есть ли в датасете столбцы, которые необходимо удалить?')
+    dp.show_data()
+    if (delete_feature_chbox):   
+        fts_to_delete= st.multiselect(
+            'Выбор предикторов для удаления', dv.features,
+            max_selections=len(dv.features)
+        )
+        sub_chbox = st.checkbox('Удалить столбцы')
+        if (len(fts_to_delete) != 0 and sub_chbox):
+            dp.remove_predictors(fts_to_delete)
+            dp.show_data()
+
 def endcode_categorial_features():
     categorial_encoder_chbox = st.checkbox('Есть ли в датасете предикторы, содержащие нечисловые категориальные значения?')
-    st.write(data[:5])
+    dp.show_data()
     if (categorial_encoder_chbox):   
         fts_to_prepare = st.multiselect(
             'Выбор предикторов c кат. значениями', dv.features,
             max_selections=len(dv.features)
         )
-        sub_chbox1 = st.checkbox('Закодировать признаки')
-        if (len(fts_to_prepare) != 0 and sub_chbox1):
+        sub_chbox = st.checkbox('Закодировать признаки')
+        if (len(fts_to_prepare) != 0 and sub_chbox):
             dp.encode_categorial(fts_to_prepare)
+            dp.show_data()
 
 def clear_anomaly():
-    sub_chbox2 = st.checkbox('Есть ли в датасете выбросы? Взгляните на диаграммы и внесите в список, если таковые имеются')
+    sub_chbox = st.checkbox('Есть ли в датасете выбросы? Взгляните на диаграммы и внесите в список, если таковые имеются')
     displacement_chbox = st.checkbox('Показать диаграммы')
 
     if (displacement_chbox):
         dv.show_displacement()
                 
-    if (sub_chbox2):
+    if (sub_chbox):
         fts_to_fix = st.multiselect(
             'Выбор предикторов с выбросами', dv.features,
             max_selections=len(dv.features)
         )
         sub_chbox3 = st.checkbox('Удалить выбросы')
-        if (len(fts_to_fix) != 0 and sub_chbox3):
+        if (len(fts_to_fix) != 0 and sub_chbox):
             dp.remove_anomaly(fts_to_fix)
 
 def clear_trash():
@@ -102,6 +117,7 @@ def preparing_manager():
 
         elif current_type == types[1]:
             clear_trash()
+            delete_features()
             endcode_categorial_features()
             clear_anomaly()
             sub_chbox4 = st.checkbox('Перейти к указанию целевого признака и получению результатов')  
@@ -109,7 +125,7 @@ def preparing_manager():
                 predict_manager()
 
 st.title("Предварительная обработка данных и получение предикта")
-data = data_loader()
+data_loader()
 main_chbox = st.checkbox('Перейти к моделям')
 if(main_chbox):
     model_change_manager()
