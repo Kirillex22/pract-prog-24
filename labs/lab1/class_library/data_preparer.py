@@ -58,6 +58,12 @@ class DataPreparer:
     def show_data(self):
         st.write(self.data.head(5))
 
+    def get_features(self):
+        return self.data.columns.to_list()
+
+    def get_data(self):
+        return self.data
+
 
 
 

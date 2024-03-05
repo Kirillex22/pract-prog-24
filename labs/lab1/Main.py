@@ -34,7 +34,6 @@ def data_loader():
     if ((data is not None) and (sep is not None)):
         data = pd.read_csv(data, sep = sep)
         dp.load_data(data)
-        dv.load_data(data)
 
 def model_change_manager():
     st.markdown("Ваш датасет:")
@@ -67,8 +66,8 @@ def delete_features():
     dp.show_data()
     if (delete_feature_chbox):   
         fts_to_delete= st.multiselect(
-            'Выбор предикторов для удаления', dv.features,
-            max_selections=len(dv.features)
+            'Выбор предикторов для удаления', dp.get_features(),
+            max_selections=len(dp.get_features())
         )
         sub_chbox = st.checkbox('Удалить столбцы')
         if (len(fts_to_delete) != 0 and sub_chbox):
@@ -80,8 +79,8 @@ def endcode_categorial_features():
     dp.show_data()
     if (categorial_encoder_chbox):   
         fts_to_prepare = st.multiselect(
-            'Выбор предикторов c кат. значениями', dv.features,
-            max_selections=len(dv.features)
+            'Выбор предикторов c кат. значениями', dp.get_features(),
+            max_selections=len(dp.get_features())
         )
         sub_chbox = st.checkbox('Закодировать признаки')
         if (len(fts_to_prepare) != 0 and sub_chbox):
@@ -91,21 +90,23 @@ def endcode_categorial_features():
 def clear_anomaly():
     sub_chbox = st.checkbox('Есть ли в датасете выбросы? Взгляните на диаграммы и внесите в список, если таковые имеются')
     displacement_chbox = st.checkbox('Показать диаграммы')
-
+    dv.load_data(dp.get_data())
     if (displacement_chbox):
         dv.show_displacement()
                 
     if (sub_chbox):
         fts_to_fix = st.multiselect(
-            'Выбор предикторов с выбросами', dv.features,
-            max_selections=len(dv.features)
+            'Выбор предикторов с выбросами', dp.get_features(),
+            max_selections=len(dp.get_features())
         )
         sub_chbox3 = st.checkbox('Удалить выбросы')
         if (len(fts_to_fix) != 0 and sub_chbox):
             dp.remove_anomaly(fts_to_fix)
 
 def clear_trash():
+    st.write("Пропуски успешно автоматически удалены")
     dp.remove_trash()
+    dp.show_data()
 
 def preparing_manager():
     types = ["Да (указание целевого признака и получение результата)", "Нет (переход к обработке)"]   
