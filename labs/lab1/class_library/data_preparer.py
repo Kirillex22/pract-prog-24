@@ -49,7 +49,7 @@ class DataPreparer:
         X = self.standartisate(
             self.data.drop([target], axis=1).to_numpy()
         )
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, stratify = y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size)
         return X_train, X_test, y_train, y_test
 
     def standartisate(self, X):
