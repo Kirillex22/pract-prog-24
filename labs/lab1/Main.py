@@ -35,6 +35,9 @@ def data_loader():
         data = pd.read_csv(data, sep = sep)
         dp.load_data(data)
 
+def data_converter(data):
+    return data.to_csv().encode('utf-8')
+
 def model_change_manager():
     st.markdown("Ваш датасет:")
     dp.show_data()
@@ -60,6 +63,12 @@ def predict_manager():
         result, report = mm.predict(X_test, y_test)
         st.json(report)
         st.write(result)
+        st.download_button(
+            label="Скачать обработанный датасет",
+            data=data_converter(dp.get_data()),
+            file_name='prepared.csv',
+            mime='text/csv',
+        )
 
 def delete_features():
     delete_feature_chbox = st.checkbox('Есть ли в датасете столбцы, которые необходимо удалить?')
