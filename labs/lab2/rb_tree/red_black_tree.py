@@ -31,6 +31,8 @@ class Node:
             color:{self.color}\n
             key:{self.key}\n
             value:{self.value}\n
+            left_key: {self.left.key if self.left != None else 'None'}\n
+            right_key: {self.right.key if self.right != None else 'None'}\n
         ''')
         
 
@@ -40,6 +42,7 @@ class Tree:
        self.root = self.NIL
        self.logging = False
     
+
     def node_exists(self, node):
         return node != self.NIL
 
@@ -150,20 +153,20 @@ class Tree:
     
 
     def get_max_node(self, node):
-        if node == None:
+        if node == self.NIL:
             return None
-        if node.right == None:
-            if node.left == None:
+        if node.right == self.NIL:
+            if node.left == self.NIL:
                 return node
             return node.left
         return self.get_max_node(node.right)
 
     
     def get_min_node(self, node):
-        if node == None:
+        if node == self.NIL:
             return None
-        if node.left == None:
-            if node.right == None:
+        if node.left == self.NIL:
+            if node.right == self.NIL:
                 return node
             return node.right
         return self.get_min_node(node.left)
@@ -251,7 +254,7 @@ class Tree:
                     brother.left.color = Color.BLACK
                     self.right_rotate(node.parent)
                     node = self.root
-        
+
         node.color = Color.BLACK
 
 
