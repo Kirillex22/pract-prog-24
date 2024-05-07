@@ -1,4 +1,5 @@
 @echo off
 call myvenv/Scripts/activate
 @pause
-streamlit run labs/lab1/Main.py
+pip install -r requirements.txt
+streamlit run labs/lab2/rb_tree/Main.py
