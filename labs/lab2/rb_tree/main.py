@@ -69,7 +69,7 @@ if session.insert_button:
             session.tree.insert(value)
             session.inserted_values.append(value)
             correct_values.append(value)
-        except Exception:
+        except:
             wrong_values.append(value)
     if correct_values:
         st.success(f'Были добавлены: {correct_values}')
