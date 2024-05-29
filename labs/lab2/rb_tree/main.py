@@ -1,17 +1,15 @@
-from rbtree_fixed import Node, Tree
+import sys
+sys.path.append('../')
+import matplotlib.pyplot as plt
 import streamlit as st
 from pydot import *
 from graphviz import *
-import time
-
-st.set_page_config(
-    page_title="RedBlackTree",
-)
+from redblacktree import *
 
 session = st.session_state
 
 if 'tree' not in session:
-    session.tree = Tree()
+    session.tree = RedBlackTree()
 
 if 'inserted_values' not in session:
     session.inserted_values = []
@@ -19,88 +17,86 @@ if 'inserted_values' not in session:
 if 'session_iteration' not in session:
     session.session_iteration = 0
 
-if 'deleting_values' not in session:
-    session.deleting_values = []
+st.title('Красно-чёрное дерево')
 
-st.title('RedBlackTree')
 sidebar = st.sidebar
+sidebar.title('Работа с деревом')
 
-
-# sidebar.subheader('Поиск')
-# value = sidebar.text_input(label='Введите число:', key='search_field', label_visibility='collapsed')
-# if sidebar.button(label='Найти', key='search_button', use_container_width=True) and value:
-#     node = session.tree.search_node(session.tree.root, int(value))
-#     if node:
-#         st.success(f'Найден узел {value}')
-#     else:
-#         st.warning(f'Не найдено: {value}')
-
-
-sidebar.subheader('Вставка')
+# вставка элемента
+sidebar.subheader('Добавление')
 sidebar.text_input(label='Введите числа:', key='insert_field', label_visibility='collapsed')
 def clear_insert_text():
-    session.new_values = session.insert_field
+    session.new_value = session.insert_field
     session["insert_field"] = ""
-sidebar.button(label='Вставить', key='insert_button', on_click=clear_insert_text, use_container_width=True)
+sidebar.button(label='Добавить', key='insert_button', on_click=clear_insert_text, use_container_width=True)
 
+# поиск элемента
+sidebar.subheader('Поиск')
+value = sidebar.text_input(label='Введите число:', key='search_field', label_visibility='collapsed')
+if sidebar.button(label='Найти', key='search_button', use_container_width=True) and value:
+    result = session.tree.search(int(value))
+    if result == True:
+        st.success(f'Найден узел {value}')
+    else:
+        st.warning(f'Не найдено: {value}')
 
+# удаление элемента
 sidebar.subheader('Удаление')
 sidebar.text_input(
     label='Введите числа:',
-    key='values2delete',
+    key='delete_field',
     label_visibility='collapsed'
 )
 def clear_delete_text():
-    session.deleting_values = session.values2delete
-    session["values2delete"] = ""
+    session.deleting_value = session.delete_field
+    session["delete_field"] = ""
 sidebar.button(label='Удалить', key='delete_button', on_click=clear_delete_text, use_container_width=True)
 
 if session.insert_button:
     try:
-        new_values = [int(value) for value in 
-                      session.new_values.split()]
-    except Exception as e:
-        new_values = None
-
-    correct_values = []
-    wrong_values = []
-    for value in new_values:
-        try:
-            session.tree.insert(value)
-            session.inserted_values.append(value)
-            correct_values.append(value)
-        except:
-            wrong_values.append(value)
-    if correct_values:
-        st.success(f'Были добавлены: {correct_values}')
-    if wrong_values:
-        st.warning(f'Ошибка: {wrong_values}')
-
-if session.delete_button:
-    try:
-        values2delete = [int(value) for value in 
-            session.deleting_values.split()]
-    except Exception as e:
-        values2delete = None
+        new_value = int(session.new_value)
+    except ValueError as e:
+        new_value = None
         st.error(f'Неправильный ввод: {e}')
 
     correct_values = []
     wrong_values = []
-    for value in values2delete:
-        try:
-            session.tree.delete_node(session.tree.root, value)
-            session.inserted_values.remove(value)
-            correct_values.append(value)
-        except ValueError:
-            wrong_values.append(value)
+    try:
+        session.tree.insert(new_value)
+        session.inserted_values.append(new_value)
+        correct_values.append(new_value)
+    except ValueError:
+        wrong_values.append(new_value)
     if correct_values:
-        st.success(f'Были удалены: {correct_values}')
+        st.success(f'Успешно добавлено: {correct_values}')
     if wrong_values:
-        st.warning(f'Не были удалены: {wrong_values}')
+        st.warning(f'Не добавлено: {wrong_values}')
+
+if session.delete_button:
+    try:
+        deleting_value = int(session.deleting_value)
+    except ValueError as e:
+        deleting_value = None
+        st.error(f'Неправильный ввод: {e}')
+
+    correct_values = []
+    wrong_values = []
+    try:
+        session.tree.delete(deleting_value)
+        session.inserted_values.remove(deleting_value)
+        correct_values.append(deleting_value)
+    except ValueError:
+        wrong_values.append(deleting_value)
+    if correct_values:
+        st.success(f'Успешно удалено: {correct_values}')
+    if wrong_values:
+        st.warning(f'Не удалено: {wrong_values}')
 
 if session.inserted_values:
+    st.subheader(f'Добавленные значения значения: {sorted(session.inserted_values)}')
     tree = session.tree
     dot = Digraph()
     dot.attr('node', fontcolor = 'white')
+    
     tree.visualize_binary_tree_dot(tree.root, dot)
     st.graphviz_chart(dot.source)
