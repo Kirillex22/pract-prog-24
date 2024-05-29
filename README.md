@@ -1,2 +1,3 @@
 - lab1: https://pract-prog-24-lab1.streamlit.app/
 - lab2: https://pract-prog-24-nnomkk2pjg28a7iybpg7qn.streamlit.app/
+- lab3: https://lab3decisiontrees.streamlit.app/
