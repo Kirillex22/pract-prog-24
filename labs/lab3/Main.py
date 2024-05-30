@@ -13,8 +13,8 @@ from class_library.data_preparer import DataPreparer
 from models.decisiontree import *
 
 mm = ModelManager({
-    'decision_tree_reg' : [MyDecisionTree(), {}],
-    'decision_tree_class' : [MyDecisionTree(metric='gini'), {}]
+    'decision_tree_reg' : [MyDecisionTree(), {}, 'regressor'],
+    'decision_tree_class' : [MyDecisionTree(metric='gini'), {}, 'classificator']
     })
 
 dv = DataVisualisator()
@@ -35,15 +35,15 @@ def model_change_manager():
     st.markdown("Ваш датасет:")
     dp.show_data()
          
-    types = ["DTR (классификация)", "DTR (регрессия)"]   
+    types = ["DTC (классификация)", "DTR (регрессия)"]   
     current_type = st.selectbox("Выберите задачу ML", types, index=None)
                
     if current_type is not None:
         if current_type == types[0]:
-            mm.set_model('decision_tree_class', 'classificator')
+            mm.set_model('decision_tree_class')
 
         elif current_type == types[1]:
-            mm.set_model('decision_tree_reg', 'regressor')
+            mm.set_model('decision_tree_reg')
 
         preparing_manager()
             

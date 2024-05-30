@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import f1_score, classification_report
 from sklearn.metrics import mean_squared_error, mean_absolute_error, mean_absolute_percentage_error, r2_score
-from sklearn.model_selection import GridSearchCV
+from imblearn.under_sampling import NearMiss
 
 class ModelManager:
     
@@ -11,17 +11,21 @@ class ModelManager:
         self.parameters = None
         self.ratio = None
         self.models = models
-        
          
-    def set_model(self, model_name:str, model_type:str):
+    def set_model(self, model_name:str):
         self.current_model = self.models[model_name][0]
         self.parameters = self.models[model_name][1]
-        if model_type == 'classificator':
+        self.model_type = self.models[model_name][2]
+        if self.model_type == 'classificator':
             self.ratio = self.class_ratio
-        elif model_type == 'regressor':
+
+        elif self.model_type == 'regressor':
             self.ratio = self.reg_ratio
 
     def fit(self, X, y):
+        if self.model_type == 'classificator':
+            X, y = self.balance_classes(X, y)
+            
         self.current_model.fit(X, y)
 
     def predict(self, X, y):     
@@ -39,7 +43,10 @@ class ModelManager:
 
         return {'MAE' : MAE, 'MSE' : MSE, 'MAPE': MAPE, 'R2' : R2}
             
-
+    def balance_classes(self, X, y):
+        nm = NearMiss()
+        X_res, y_res = nm.fit_resample(X, y)
+        return X_res, y_res
 
 
                 

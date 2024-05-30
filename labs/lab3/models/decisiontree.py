@@ -80,4 +80,4 @@ class MyDecisionTree:
         
     def finder(self, x, node): 
         f = lambda x: self.finder(x, node['left_child']) if (x[int(node['index'])] < node['value']) else self.finder(x, node['right_child'])   
-        return (node['predict'] if ('predict' in node) else f(x))                    
+        return (node['predict'] if ('predict' in node) else f(x)) 
