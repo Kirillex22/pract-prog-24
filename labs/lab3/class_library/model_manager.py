@@ -25,6 +25,7 @@ class ModelManager:
     def fit(self, X, y):
         if self.model_type == 'classificator':
             X, y = self.balance_classes(X, y)
+            print(f'succesful imbalance removing')
             
         self.current_model.fit(X, y)
 
