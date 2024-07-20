@@ -24,10 +24,11 @@ class ModelManager:
 
     def fit(self, X, y):
         if self.model_type == 'classificator':
-            X, y = self.balance_classes(X, y)
-            print(f'succesful imbalance removing')
-            
-        self.current_model.fit(X, y)
+            X_balanced, y_balanced = self.balance_classes(X, y)
+            print(X_balanced.shape[0], y_balanced.shape[0])
+            self.current_model.fit(X_balanced, y_balanced)
+        else:  
+            self.current_model.fit(X, y)
 
     def predict(self, X, y):     
         predict = self.current_model.predict(X)
